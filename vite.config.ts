@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "node:path";
+import axios from "axios";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
@@ -145,6 +146,24 @@ function vitePluginManusDebugCollector(): Plugin {
             res.end(JSON.stringify({ success: false, error: String(e) }));
           }
         });
+      });
+
+      // GET /api/github/activity: Fetch real-time GitHub events
+      server.middlewares.use("/api/github/activity", async (req, res, next) => {
+        if (req.method !== "GET") return next();
+        try {
+          const response = await axios.get("https://api.github.com/users/Hey-Astreon/events", {
+            headers: {
+              "Accept": "application/vnd.github.v3+json",
+              "User-Agent": "Astreon-Portfolio-v4"
+            }
+          });
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(response.data.slice(0, 10)));
+        } catch (error: any) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Failed to fetch GitHub activity" }));
+        }
       });
     },
   };

@@ -5,6 +5,7 @@ import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise, Scanline }
 import { VolumetricNebula } from './VolumetricNebula';
 import * as THREE from 'three';
 import { AetherEngine } from './AetherEngine';
+import { NeuralDataStream } from './NeuralDataStream';
 import gsap from 'gsap';
 
 // --- Shader Background Components ---
@@ -279,6 +280,9 @@ function SceneManager({ settings, warp, velocity }: { settings: any, warp: numbe
       <AetherLattice velocity={velocity} />
       <VolumetricNebula color="#bf94ff" density={settings.density} />
       <MorphingCore />
+      <group position={[0, -30, 0]}>
+        <NeuralDataStream />
+      </group>
       <SectionHeaders />
       <OrbitalLights intensity={settings.perfMode ? 0 : 20} />
       <EffectComposer multisampling={0} enableNormalPass={false}>

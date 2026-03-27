@@ -20,11 +20,11 @@ const USAGE_TRACKER_KEY = 'astra_usage_tracker';
 
 import { Canvas, useFrame } from '@react-three/fiber';
 
-// --- Reactive Lifeform Core (v2.0) ---
+// --- Reactive Lifeform Core (v2.0 - Crystalline Icosahedron) ---
 const ReactiveAstraCore = ({ isOpen, globalMouse }: { isOpen: boolean, globalMouse: React.MutableRefObject<THREE.Vector2> }) => {
   const groupRef = useRef<THREE.Group>(null!);
-  const ring1Ref = useRef<THREE.Mesh>(null!);
-  const ring2Ref = useRef<THREE.Mesh>(null!);
+  const shellRef = useRef<THREE.Mesh>(null!);
+  const knotRef = useRef<THREE.Mesh>(null!);
   const coreRef = useRef<THREE.Mesh>(null!);
   
   // Physics States
@@ -34,74 +34,68 @@ const ReactiveAstraCore = ({ isOpen, globalMouse }: { isOpen: boolean, globalMou
   
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
-    
-    // Use the global mouse coords passed from the parent
     const mousePos = globalMouse.current;
 
-    // Calculate Mouse Velocity
     const mouseVel = mousePos.clone().sub(mouseLast.current);
     const speed = mouseVel.length() / delta;
     mouseLast.current.copy(mousePos);
 
-    // 2. Targeted Position (Follow Cursor with Offset)
-    // Scale the [-1, 1] normalized mouse coords to the small core space
     const targetX = isOpen ? 0 : mousePos.x * 2.8; 
     const targetY = isOpen ? 0 : mousePos.y * 2.8;
     const target = new THREE.Vector3(targetX, targetY, 0);
 
-    // 3. Spring Physics Logic
-    const springK = 14.0; // High-stiffness for "nervous" sentient feel
-    const damping = 0.72; // Snappy damping
+    const springK = 18.0; // Snappier feel
+    const damping = 0.68;
     
     const force = new THREE.Vector3().subVectors(target, currentPos.current).multiplyScalar(springK);
     
-    // 4. "Avasiveness" (Evasion Logic)
     const dist = target.distanceTo(currentPos.current);
-    if (speed > 4.5 && dist < 1.2) {
-      const repulsion = new THREE.Vector3().subVectors(currentPos.current, target).normalize().multiplyScalar(speed * 1.2);
+    if (speed > 4.0 && dist < 1.0) {
+      const repulsion = new THREE.Vector3().subVectors(currentPos.current, target).normalize().multiplyScalar(speed * 1.5);
       force.add(repulsion);
     }
 
     velocity.current.add(force.multiplyScalar(delta)).multiplyScalar(damping);
     currentPos.current.add(velocity.current.multiplyScalar(delta));
 
-    // 5. Apply to Mesh
     if (groupRef.current) {
       groupRef.current.position.set(currentPos.current.x, currentPos.current.y, currentPos.current.z);
-      groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.1;
-      groupRef.current.rotation.z = Math.cos(t * 0.3) * 0.1;
+      groupRef.current.rotation.y = t * 0.5;
+      groupRef.current.rotation.z = Math.sin(t * 0.3) * 0.2;
     }
 
-    // 6. Ring & Core Animations
-    if (ring1Ref.current) ring1Ref.current.rotation.z = t * 0.4;
-    if (ring2Ref.current) ring2Ref.current.rotation.x = t * 0.2;
+    if (shellRef.current) shellRef.current.rotation.x = -t * 0.3;
+    if (knotRef.current) knotRef.current.rotation.z = t * 0.8;
     if (coreRef.current) {
-      const pulse = 1 + Math.sin(t * 4) * 0.1;
+      const pulse = 1 + Math.sin(t * 6) * 0.15;
       coreRef.current.scale.setScalar(pulse);
     }
   });
 
   return (
     <group ref={groupRef}>
+      {/* Inner Core: Glowing Crystalline Center */}
       <mesh ref={coreRef}>
-        <sphereGeometry args={[0.2, 32, 32]} />
+        <icosahedronGeometry args={[0.18, 0]} />
         <meshBasicMaterial color="#ffffff" toneMapped={false} />
-        <pointLight intensity={2} color="#4dadeb" distance={5} />
+        <pointLight intensity={3} color="#00f5ff" distance={5} />
       </mesh>
       
-      <mesh scale={1.2}>
-        <sphereGeometry args={[0.25, 32, 32]} />
-        <meshBasicMaterial color="#4dadeb" transparent opacity={0.2} blending={AdditiveBlending} />
+      {/* Outer Shell: Wireframe Architecture */}
+      <mesh ref={shellRef} scale={1.35}>
+        <icosahedronGeometry args={[0.22, 1]} />
+        <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.4} blending={AdditiveBlending} />
       </mesh>
 
+      {/* Orbital Knots: Data Streams */}
       <group rotation={[Math.PI / 4, 0, 0]}>
-        <mesh ref={ring1Ref}>
-          <torusGeometry args={[0.6, 0.01, 12, 64]} />
-          <meshBasicMaterial color="#bf94ff" transparent opacity={0.6} blending={AdditiveBlending} />
+        <mesh ref={knotRef}>
+          <torusKnotGeometry args={[0.55, 0.008, 128, 16, 2, 3]} />
+          <meshBasicMaterial color="#bf94ff" transparent opacity={0.7} blending={AdditiveBlending} />
         </mesh>
-        <mesh ref={ring2Ref} rotation={[Math.PI / 3, 0, 0]}>
-          <torusGeometry args={[0.7, 0.005, 8, 48]} />
-          <meshBasicMaterial color="#4dadeb" transparent opacity={0.4} blending={AdditiveBlending} />
+        <mesh rotation={[Math.PI / 2, 0, 0]} scale={0.9}>
+          <torusKnotGeometry args={[0.65, 0.005, 128, 16, 3, 4]} />
+          <meshBasicMaterial color="#4dadeb" transparent opacity={0.3} blending={AdditiveBlending} />
         </mesh>
       </group>
     </group>
@@ -362,7 +356,7 @@ export function AstraAssistant() {
       {/* Trigger Button */}
       <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3">
         {!isOpen && (
-          <div className="bg-[#000000]/90 border border-[#bf94ff]/40 px-3 py-1.5 rounded-full text-[10px] font-mono text-[#d1b3ff] uppercase tracking-widest backdrop-blur-md animate-bounce">
+          <div className="bg-[#000000]/90 border border-[#00f5ff]/40 px-3 py-1.5 rounded-full text-[10px] font-mono text-[#00f5ff] uppercase tracking-widest backdrop-blur-md animate-pulse shadow-[0_0_10px_rgba(0,245,255,0.2)]">
             Astra Core Active
           </div>
         )}

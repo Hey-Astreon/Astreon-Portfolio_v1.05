@@ -1,4 +1,4 @@
-# 3D Portfolio Design Brainstorm - Roushan Kumar
+# 3D Portfolio Design Brainstorm - Ayushi Raj
 
 ## Response 1: Cyberpunk Neon Minimalism (Probability: 0.08)
 

@@ -1,4 +1,4 @@
-# Roushan Kumar - 3D Immersive Portfolio
+# Ayushi Raj - 3D Immersive Portfolio
 
 ## Project Overview
 
@@ -436,7 +436,7 @@ All components use Tailwind's responsive prefixes:
 
 ## 📄 License
 
-© 2026 Roushan Kumar. All rights reserved.
+© 2026 Ayushi Raj. All rights reserved.
 
 ---
 

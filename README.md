@@ -1,4 +1,4 @@
-# Roushan Kumar - 3D Immersive Portfolio
+# Ayushi Raj - 3D Immersive Portfolio
 
 > An immersive, interactive 3D portfolio website featuring scroll-triggered animations, cyberpunk neon aesthetic, and smooth parallax effects.
 
@@ -371,7 +371,7 @@ See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for more troubleshooting.
 
 ## 📄 License
 
-© 2026 Roushan Kumar. All rights reserved.
+© 2026 Ayushi Raj. All rights reserved.
 
 ---
 
@@ -400,4 +400,4 @@ See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for more troubleshooting.
 
 **Last Updated:** March 22, 2026  
 **Checkpoint Version:** cc13f2c4  
-**Built with ❤️ by Roushan Kumar**
+**Built with ❤️ by Ayushi Raj**

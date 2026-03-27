@@ -84,7 +84,7 @@ function HeroSection() {
 
           <div ref={titleGroupRef} className="mb-6">
             <h1 className={`${isRecruiterMode ? 'text-[#1a1a1a]' : 'text-white glow-text'} text-[clamp(2.5rem,8vw,7rem)] leading-none font-black relative break-words tracking-tighter uppercase font-space`}>
-              Roushan Kumar
+              Ayushi Raj
             </h1>
           </div>
 

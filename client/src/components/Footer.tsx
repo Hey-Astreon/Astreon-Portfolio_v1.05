@@ -125,7 +125,7 @@ export function Footer() {
                 <div className="w-2 h-2 rounded-full bg-[#00f5ff] animate-pulse shadow-[0_0_10px_#00f5ff]" />
                 <span className="text-[10px] font-mono text-[#00f5ff] uppercase tracking-[0.3em]">Singularity_Active</span>
              </div>
-             <p className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">© 2026 Roushan Kumar. All architectural patterns reserved.</p>
+             <p className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">© 2026 Ayushi Raj. All architectural patterns reserved.</p>
           </div>
 
           <div className="flex items-center gap-4 flex-wrap justify-center">

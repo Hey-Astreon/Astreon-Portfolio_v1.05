@@ -280,7 +280,7 @@ function SceneManager({ settings, warp, velocity }: { settings: any, warp: numbe
       <AetherLattice velocity={velocity} />
       <VolumetricNebula color="#bf94ff" density={settings.density} />
       <MorphingCore />
-      <group position={[0, -30, 0]}>
+      <group position={[0, -30 + (window.scrollY * 0.01), 0]}>
         <NeuralDataStream />
       </group>
       <SectionHeaders />

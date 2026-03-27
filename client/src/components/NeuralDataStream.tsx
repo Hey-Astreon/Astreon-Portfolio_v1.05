@@ -31,7 +31,7 @@ const vertexShader = `
     pos.x += sin(uTime * 0.5 + aOffset) * 0.2;
     
     vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = 4.0 * (1.0 / -mvPosition.z);
+    gl_PointSize = 12.0 * (1.0 / -mvPosition.z); // Increased from 4.0
     gl_Position = projectionMatrix * mvPosition;
   }
 `;
@@ -44,13 +44,13 @@ const fragmentShader = `
 
   void main() {
     // Sparkle effect
-    float sparkle = Math.sin(uTime * 10.0 + vOpacity * 100.0) * 0.5 + 0.5;
+    float sparkle = sin(uTime * 15.0 + vOpacity * 100.0) * 0.5 + 0.5;
     float strength = distance(gl_PointCoord, vec2(0.5));
     strength = 1.0 - strength;
-    strength = pow(strength, 3.0);
+    strength = pow(strength, 2.0); // More concentrated spark
     
-    vec3 color = uColor * (0.8 + sparkle * 0.2);
-    gl_FragColor = vec4(color, strength * vOpacity * 0.6);
+    vec3 color = uColor * (1.0 + sparkle * 1.5); // Brighter peaks
+    gl_FragColor = vec4(color, strength * vOpacity * 0.9); // Higher opacity
   }
 `;
 

@@ -51,7 +51,7 @@ export function Navigation() {
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 right-0 z-50 py-4 px-4 md:px-8 transition-all duration-300 border-b border-transparent"
+      className="fixed top-0 left-0 right-0 z-[100] py-4 px-4 md:px-8 transition-all duration-300 border-b border-transparent"
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <NeuralRKLogo />

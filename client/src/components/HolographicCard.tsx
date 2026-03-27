@@ -1,23 +1,27 @@
 import { useRef, useState, MouseEvent } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Github, Monitor } from 'lucide-react';
+import { useIsMobile } from '@/hooks/useMobile';
 
 interface HolographicCardProps {
   title: string;
   description: string;
   tech: string[];
-  link: string;
+  link?: string;
+  github?: string;
+  live?: string;
   date: string;
   index: number;
   previewUrl?: string;
 }
 
-export function HolographicCard({ title, description, tech, link, date, index, previewUrl }: HolographicCardProps) {
+export function HolographicCard({ title, description, tech, link, github, live, date, index, previewUrl }: HolographicCardProps) {
+  const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [shimmerPosition, setShimmerPosition] = useState({ x: 50, y: 50 });
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isMobile) return;
     
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left; // x position within the element
@@ -120,17 +124,29 @@ export function HolographicCard({ title, description, tech, link, date, index, p
               ))}
             </div>
 
-            <div className="flex items-center justify-between">
-              <a
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex max-w-max items-center gap-2 text-[#4dadeb] hover:text-[#00f5ff] font-bold transition-all group/link uppercase tracking-wider text-xs border-b border-transparent hover:border-[#00f5ff] pb-1"
-              >
-                Link Protocol
-                <ExternalLink className="w-3.5 h-3.5 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
-              </a>
-              <span className="text-[8px] font-mono text-white/20 opacity-0 group-hover:opacity-100 transition-opacity">DATA_SECURE: YES</span>
+            <div className="flex items-center gap-4">
+              {(live || link) && (
+                <a
+                  href={live || link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-sm border border-[#00f5ff]/30 bg-[#00f5ff]/5 text-[#4dadeb] hover:text-[#00f5ff] hover:bg-[#00f5ff]/10 hover:border-[#00f5ff] transition-all text-[10px] font-bold uppercase tracking-wider group/link"
+                >
+                  <Monitor className="w-3.5 h-3.5" />
+                  Live Demo
+                </a>
+              )}
+              {github && (
+                <a
+                  href={github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-sm border border-white/20 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/40 transition-all text-[10px] font-bold uppercase tracking-wider group/link"
+                >
+                  <Github className="w-3.5 h-3.5" />
+                  GitHub
+                </a>
+              )}
             </div>
           </div>
         </div>

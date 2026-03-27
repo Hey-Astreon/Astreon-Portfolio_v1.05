@@ -5,6 +5,7 @@ import { ASTRA_SYSTEM_PROMPT, ASTRA_QUICK_CHIPS } from '@/data/astraData';
 import { X, Send, Copy, Check, ChevronDown, Sparkles, Brain, Cpu, ShieldCheck } from 'lucide-react';
 import gsap from 'gsap';
 import { useAstraVoice } from '@/hooks/useAstraVoice';
+import { useIsMobile } from '@/hooks/useMobile';
 
 // --- Types ---
 interface Message {
@@ -21,7 +22,7 @@ const USAGE_TRACKER_KEY = 'astra_usage_tracker';
 import { Canvas, useFrame } from '@react-three/fiber';
 
 // --- Reactive Lifeform Core (v2.0 - Crystalline Icosahedron) ---
-const ReactiveAstraCore = ({ isOpen, globalMouse }: { isOpen: boolean, globalMouse: React.MutableRefObject<THREE.Vector2> }) => {
+const ReactiveAstraCore = ({ isOpen, globalMouse, isMobile }: { isOpen: boolean, globalMouse: React.MutableRefObject<THREE.Vector2>, isMobile: boolean }) => {
   const groupRef = useRef<THREE.Group>(null!);
   const shellRef = useRef<THREE.Mesh>(null!);
   const knotRef = useRef<THREE.Mesh>(null!);
@@ -57,11 +58,26 @@ const ReactiveAstraCore = ({ isOpen, globalMouse }: { isOpen: boolean, globalMou
     }
 
     // 3. "Neural Breathing" Pulse
-    if (coreRef.current) {
+    if (coreRef.current && !isMobile) {
       const pulse = 1 + Math.sin(t * 2.5) * 0.08; // Slower, rhythmic breath
       coreRef.current.scale.setScalar(pulse);
     }
   });
+
+  if (isMobile) {
+    return (
+      <group>
+        <mesh>
+          <icosahedronGeometry args={[0.2, 0]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+        <mesh scale={1.4}>
+          <icosahedronGeometry args={[0.22, 1]} />
+          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.3} />
+        </mesh>
+      </group>
+    );
+  }
 
   return (
     <group ref={groupRef}>
@@ -116,7 +132,7 @@ const AstraLogo = ({ isOpen }: { isOpen: boolean }) => {
           style={{ pointerEvents: 'none' }}
         >
           <ambientLight intensity={0.5} />
-          <ReactiveAstraCore isOpen={isOpen} globalMouse={globalMouse} />
+          <ReactiveAstraCore isOpen={isOpen} globalMouse={globalMouse} isMobile={useIsMobile()} />
         </Canvas>
       </div>
   
@@ -141,6 +157,7 @@ export function AstraAssistant() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const { speak, stop, enabled: voiceEnabled } = useAstraVoice();
+  const isMobile = useIsMobile();
 
   // Voice effect for new messages
   useEffect(() => {
@@ -345,18 +362,18 @@ export function AstraAssistant() {
   return (
     <>
       {/* Trigger Button */}
-      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3">
-        {!isOpen && (
+      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-[9999] flex flex-col items-end gap-3`}>
+        {!isOpen && !isMobile && (
           <div className="bg-[#000000]/90 border border-[#00f5ff]/40 px-3 py-1.5 rounded-full text-[10px] font-mono text-[#00f5ff] uppercase tracking-widest backdrop-blur-md animate-pulse shadow-[0_0_10px_rgba(0,245,255,0.2)]">
             Astra Core Active
           </div>
         )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`group p-1 rounded-full border-2 transition-all duration-500 hover:scale-110 active:scale-95 ${isOpen ? 'border-[#d1b3ff] bg-[#bf94ff]/10' : 'border-[#bf94ff] bg-[#000000]'}`}
+          className={`group p-1 rounded-full border-2 transition-all duration-500 hover:scale-110 active:scale-95 ${isOpen ? 'border-[#d1b3ff] bg-[#bf94ff]/10' : 'border-[#bf94ff] bg-[#000000]'} ${isMobile ? 'scale-75 origin-bottom-right' : ''}`}
           style={{ boxShadow: isOpen ? '0 0 30px rgba(191,148,255,0.4)' : '0 0 15px rgba(191,148,255,0.2)' }}
         >
-          {isOpen ? <X className="w-10 h-10 text-[#d1b3ff]" /> : <AstraLogo isOpen={isOpen} />}
+          {isOpen ? <X className={isMobile ? "w-8 h-8 text-[#d1b3ff]" : "w-10 h-10 text-[#d1b3ff]"} /> : <AstraLogo isOpen={isOpen} />}
         </button>
       </div>
 

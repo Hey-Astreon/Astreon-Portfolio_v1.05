@@ -307,6 +307,7 @@ export function CombinedScene({
   forceSingularity = 0, 
   ecoMode = false 
 }: { 
+  role?: string;
   forceGlitch?: number; 
   forceSingularity?: number; 
   ecoMode?: boolean;
@@ -315,11 +316,14 @@ export function CombinedScene({
   const [velocity, setVelocity] = useState(0);
   const [warp, setWarp] = useState(forceGlitch);
   const lastScrollY = useRef(window.scrollY);
+  
+  // Use a hard-coded check for mobile to ensure we catch it early in the render cycle
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   useEffect(() => {
-    setEngineSettings(prev => ({ ...prev, perfMode: ecoMode }));
-    setWarp(forceGlitch); // Link warp to glitch for visual impact
-  }, [ecoMode, forceGlitch]);
+    setEngineSettings(prev => ({ ...prev, perfMode: ecoMode || isMobile }));
+    setWarp(forceGlitch); 
+  }, [ecoMode, forceGlitch, isMobile]);
 
   useEffect(() => {
     const handleUpdate = (e: any) => setEngineSettings(e.detail);
@@ -338,10 +342,10 @@ export function CombinedScene({
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas 
-        shadows 
+        shadows={!isMobile} 
         camera={{ position: [0, 0, 5], fov: 75 }} 
-        gl={{ antialias: !engineSettings.perfMode, alpha: true }} 
-        dpr={engineSettings.perfMode ? [1, 1.5] : [1, 2]}
+        gl={{ antialias: !isMobile && !engineSettings.perfMode, alpha: true, stencil: false, depth: true }} 
+        dpr={isMobile ? 1 : engineSettings.perfMode ? [1, 1.5] : [1, 2]}
         onCreated={({ gl }) => {
           gl.domElement.addEventListener('webglcontextlost', (e) => {
             e.preventDefault();

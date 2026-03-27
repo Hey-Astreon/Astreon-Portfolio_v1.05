@@ -13,6 +13,7 @@ import { NeuralContactForm } from '@/components/NeuralContactForm';
 import { NeuralNexusSocials } from '@/components/NeuralNexusSocials';
 import { GitHubActivityCard } from '@/components/GitHubActivityCard';
 import { ResumeScanModal } from '@/components/ResumeScanModal';
+import { useIsMobile } from '@/hooks/useMobile';
 
 // Lazy-Uplink: Heavy Graphical & Interactive Modules
 const CombinedScene = lazy(() => import('@/components/CombinedScene').then(m => ({ default: m.CombinedScene })));
@@ -76,33 +77,33 @@ function HeroSection() {
           </div>
 
           <div ref={titleGroupRef} className="mb-6">
-            <h1 className="text-[clamp(2.5rem,8vw,6.5rem)] leading-none font-black glow-text relative break-words uppercase tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+            <h1 className="text-[clamp(2.2rem,7vw,6.5rem)] leading-none font-black glow-text relative break-words uppercase tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif' }}>
               <ScrambleText text="ROUSHAN" delay={1200} />
             </h1>
-            <h1 className="text-[clamp(2.5rem,8vw,6.5rem)] leading-none font-black glow-text-violet relative break-words uppercase tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif', marginTop: '-0.05em' }}>
+            <h1 className="text-[clamp(2.2rem,7vw,6.5rem)] leading-none font-black glow-text-violet relative break-words uppercase tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif', marginTop: '-0.05em' }}>
               <ScrambleText text="KUMAR" delay={1400} />
             </h1>
           </div>
 
-          <p ref={subtitleRef} className="text-base md:text-lg lg:text-xl text-[#4dadeb] mb-8 font-bold tracking-[0.2em] uppercase" style={{ fontFamily: 'Share Tech Mono, monospace', textShadow: '0 0 10px rgba(77, 173, 235, 0.5)' }}>
-            &gt; <ScrambleText text="Prompt Engineer // AI & System Architect" delay={1600} /> _
+          <p ref={subtitleRef} className="text-sm md:text-base lg:text-lg text-[#4dadeb] mb-8 font-bold tracking-[0.15em] uppercase" style={{ fontFamily: 'Share Tech Mono, monospace', textShadow: '0 0 10px rgba(77, 173, 235, 0.5)' }}>
+            &gt; <ScrambleText text="BCA Student | Python & AI Developer" delay={1600} /> _
           </p>
 
           <p ref={descRef} className="text-[#e5e4e2] text-sm md:text-base mb-12 max-w-2xl lg:mx-0 leading-relaxed opacity-80 backdrop-blur-sm p-4 rounded-xl border border-[rgba(191,148,255,0.15)] bg-[rgba(5,5,10,0.6)]">
-            BCA student crafting immersive digital experiences with Python, AI, and cutting-edge web technologies. Passionate about building scalable applications and exploring the intersection of code and creativity.
+            Building scalable web apps and intelligent systems. Passionate about exploring the intersection of code, computational logic, and neural creativity.
           </p>
 
           <div ref={ctaRef} className="flex gap-4 md:gap-6 justify-center lg:justify-start flex-wrap pointer-events-auto">
             <button onClick={() => scrollToSection('projects')} className="btn-primary group flex items-center gap-3 text-xs md:text-base font-orbitron font-bold">
-              Access Database
+              View Projects
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform" />
             </button>
             <button 
-              onClick={() => (window as any).openResumeScan?.()} 
+              onClick={() => scrollToSection('contact')} 
               className="btn-secondary flex items-center gap-2 text-xs md:text-base font-orbitron font-bold"
             >
-              <Award className="w-4 h-4" />
-              Scan Credentials
+              <MessageSquare className="w-4 h-4" />
+              Contact Me
             </button>
           </div>
         </div>
@@ -128,25 +129,28 @@ function ProjectsSection() {
   const projects = [
     {
       title: 'Dynamic Quiz Management System',
-      description: 'Python-based structural logic application with advanced user and admin modes for dynamic data management.',
+      description: 'Designed a dynamic quiz platform with optimized data handling and role-based architecture for scalable user interaction.',
       tech: ['Python', 'File Architecture', 'Modular Programming'],
-      link: 'https://github.com/Hey-Astreon/Dynamic-Quiz-Management-System',
+      github: 'https://github.com/Hey-Astreon/Dynamic-Quiz-Management-System',
+      live: 'https://github.com/Hey-Astreon/Dynamic-Quiz-Management-System',
       date: 'Jan 2026',
       previewUrl: '/quiz-preview.png'
     },
     {
       title: 'AI CRM HCP Interaction Hub',
-      description: 'AI-driven CRM system for logging healthcare professional interactions with an advanced neural chat interface.',
+      description: 'Engineered a high-performance AI CRM module for pharmaceutical interactions, featuring neural link synchronization and real-time data persistence.',
       tech: ['Python', 'React', 'FastAPI', 'JavaScript'],
-      link: 'https://github.com/Hey-Astreon/AI-CRM-HCP-Interaction-Logging-Module',
+      github: 'https://github.com/Hey-Astreon/AI-CRM-HCP-Interaction-Logging-Module',
+      live: 'https://github.com/Hey-Astreon/AI-CRM-HCP-Interaction-Logging-Module',
       date: 'Mar 2026',
       previewUrl: '/crm-preview.png'
     },
     {
       title: 'Student Record Management System',
-      description: 'A comprehensive student record management system with secure authentication, data management, and admin controls.',
+      description: 'Architected a secure student record system with encrypted authentication and modular data streams for high-integrity institutional management.',
       tech: ['Python', 'File Management', 'Admin Auth', 'CLI'],
-      link: 'https://github.com/Hey-Astreon/Student-Record-Management-System',
+      github: 'https://github.com/Hey-Astreon/Student-Record-Management-System',
+      live: 'https://github.com/Hey-Astreon/Student-Record-Management-System',
       date: '2025',
       previewUrl: '/prompt-preview.png'
     },
@@ -438,9 +442,17 @@ function NeuralHUD({
 }
 
 export default function Home() {
+  const isMobile = useIsMobile();
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
   const [isPerformanceMode, setIsPerformanceMode] = useState(true);
   const [isOverrideEnabled, setIsOverrideEnabled] = useState(false);
+
+  useEffect(() => {
+    // Auto-enable eco mode on mobile
+    if (isMobile) {
+      setIsPerformanceMode(false);
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     (window as any).openResumeScan = () => setIsResumeModalOpen(true);
@@ -472,12 +484,14 @@ export default function Home() {
 
       <div className="relative z-10">
         <Navigation />
-        <NeuralHUD 
-          isPerformanceMode={isPerformanceMode} 
-          setIsPerformanceMode={setIsPerformanceMode}
-          isOverrideEnabled={isOverrideEnabled}
-          setIsOverrideEnabled={setIsOverrideEnabled}
-        />
+        {!isMobile && (
+          <NeuralHUD 
+            isPerformanceMode={isPerformanceMode} 
+            setIsPerformanceMode={setIsPerformanceMode}
+            isOverrideEnabled={isOverrideEnabled}
+            setIsOverrideEnabled={setIsOverrideEnabled}
+          />
+        )}
         <HeroSection />
         
         <div className="neural-border-top py-12">

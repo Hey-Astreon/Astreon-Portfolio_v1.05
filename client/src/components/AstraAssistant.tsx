@@ -40,23 +40,27 @@ const ReactiveAstraCore = ({ isOpen, globalMouse }: { isOpen: boolean, globalMou
     const speed = mouseVel.length() / delta;
     mouseLast.current.copy(mousePos);
 
-    const targetX = isOpen ? 0 : mousePos.x * 2.8; 
-    const targetY = isOpen ? 0 : mousePos.y * 2.8;
+    const targetX = isOpen ? 0 : mousePos.x * 2.2; // Reduced from 2.8
+    const targetY = isOpen ? 0 : mousePos.y * 2.2;
     const target = new THREE.Vector3(targetX, targetY, 0);
 
-    const springK = 18.0; // Snappier feel
+    const springK = 18.0;
     const damping = 0.68;
     
     const force = new THREE.Vector3().subVectors(target, currentPos.current).multiplyScalar(springK);
     
     const dist = target.distanceTo(currentPos.current);
     if (speed > 4.0 && dist < 1.0) {
-      const repulsion = new THREE.Vector3().subVectors(currentPos.current, target).normalize().multiplyScalar(speed * 1.5);
+      const repulsion = new THREE.Vector3().subVectors(currentPos.current, target).normalize().multiplyScalar(Math.min(speed * 1.5, 10)); // Capped repulsion
       force.add(repulsion);
     }
 
     velocity.current.add(force.multiplyScalar(delta)).multiplyScalar(damping);
     currentPos.current.add(velocity.current.multiplyScalar(delta));
+
+    // Spatial Clamping (Stay within container)
+    currentPos.current.x = THREE.MathUtils.clamp(currentPos.current.x, -2.4, 2.4);
+    currentPos.current.y = THREE.MathUtils.clamp(currentPos.current.y, -2.4, 2.4);
 
     if (groupRef.current) {
       groupRef.current.position.set(currentPos.current.x, currentPos.current.y, currentPos.current.z);

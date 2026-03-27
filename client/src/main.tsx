@@ -3,6 +3,7 @@ import gsap from "gsap";
 import Lenis from "lenis";
 import App from "./App";
 import "./index.css";
+import { ModeProvider } from "./contexts/ModeContext";
 
 // Initialize Lenis for smooth scrolling
 const lenis = new Lenis({
@@ -23,4 +24,8 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0);
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <ModeProvider>
+    <App />
+  </ModeProvider>
+);

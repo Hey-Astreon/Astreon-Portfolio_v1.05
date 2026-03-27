@@ -7,13 +7,14 @@ import { SplitTextGlow } from '@/components/SplitTextGlow';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-import { Github, Linkedin, Mail, Code, Zap, Award, ArrowRight, Sparkles, MessageSquare } from 'lucide-react';
+import { Github, Linkedin, Mail, Code, Zap, Award, ArrowRight, Sparkles, MessageSquare, Briefcase } from 'lucide-react';
 import { ScrambleText } from '@/components/ScrambleText';
 import { NeuralContactForm } from '@/components/NeuralContactForm';
 import { NeuralNexusSocials } from '@/components/NeuralNexusSocials';
 import { GitHubActivityCard } from '@/components/GitHubActivityCard';
 import { ResumeScanModal } from '@/components/ResumeScanModal';
 import { useIsMobile } from '@/hooks/useMobile';
+import { useMode } from '@/contexts/ModeContext';
 
 // Lazy-Uplink: Heavy Graphical & Interactive Modules
 const CombinedScene = lazy(() => import('@/components/CombinedScene').then(m => ({ default: m.CombinedScene })));
@@ -23,6 +24,7 @@ const VolumetricAvatar = lazy(() => import('@/components/VolumetricAvatar').then
 
 
 function HeroSection() {
+  const { isPerformanceMode, isRecruiterMode } = useMode();
   const titleGroupRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
@@ -41,6 +43,7 @@ function HeroSection() {
   };
 
   useEffect(() => {
+    if (isPerformanceMode || isRecruiterMode) return;
     if (!titleGroupRef.current || !subtitleRef.current || !descRef.current || !ctaRef.current || !badgeRef.current) return;
 
     const tl = gsap.timeline({ delay: 0.5 });
@@ -50,57 +53,57 @@ function HeroSection() {
       .fromTo(subtitleRef.current, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out' }, "-=0.8")
       .fromTo(descRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, "-=0.6")
       .fromTo(ctaRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, "-=0.4");
-  }, []);
+  }, [isPerformanceMode, isRecruiterMode]);
 
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 max-w-7xl mx-auto px-6 py-20">
+      <div className={`relative z-10 flex flex-col ${isRecruiterMode ? 'items-center text-center' : 'lg:flex-row items-center gap-12'} max-w-7xl mx-auto px-6 py-20`}>
         
-        {/* Volumetric Neural Identity (3D upgrade) */}
-        <div className="relative w-72 h-72 md:w-[450px] md:h-[450px] lg:-mr-12 group">
-          <Suspense fallback={<div className="w-full h-full bg-white/5 animate-pulse rounded-full" />}>
-            <VolumetricAvatar />
-          </Suspense>
-          
-          {/* Floating HUD accents */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[#bf94ff]/10 rounded-full animate-spin-slow pointer-events-none" />
-          <div className="absolute -bottom-4 -left-4 font-mono text-[8px] text-[#bf94ff]/40 rotate-90 uppercase tracking-widest">
-            Aether_Core_v4.0 // Neural_Volumetric_Active
+        {/* Volumetric Avatar - Hidden in Recruiter mode or on scroll focus */}
+        {!isRecruiterMode && (
+          <div className="relative w-72 h-72 md:w-[450px] md:h-[450px] lg:-mr-12 group avatar-container transition-opacity duration-1000">
+            {!isPerformanceMode && (
+              <Suspense fallback={<div className="w-full h-full bg-white/5 animate-pulse rounded-full" />}>
+                <VolumetricAvatar />
+              </Suspense>
+            )}
+            
+            {/* Floating HUD accents */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[var(--neon-purple)]/10 rounded-full animate-spin-slow pointer-events-none" />
           </div>
-        </div>
+        )}
 
         {/* Hero Content */}
-        <div className="text-center lg:text-left pointer-events-none max-w-3xl">
-          <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 rounded-sm border border-[#bf94ff] bg-[rgba(191,148,255,0.1)] text-[#d1b3ff] mb-8 text-xs md:text-sm font-bold tracking-widest uppercase" style={{ boxShadow: '0 0 15px rgba(191,148,255,0.2)' }}>
-            <Sparkles className="w-4 h-4" />
-            <span>System Online</span>
-          </div>
+        <div className={`${isRecruiterMode ? 'text-center' : 'text-center lg:text-left'} max-w-3xl`}>
+          {!isRecruiterMode && (
+            <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 rounded-sm border border-[var(--neon-purple)] bg-[rgba(138,43,226,0.1)] text-[var(--neon-cyan)] mb-8 text-xs md:text-sm font-bold tracking-widest uppercase" style={{ boxShadow: '0 0 15px rgba(138,43,226,0.2)' }}>
+              <Sparkles className="w-4 h-4" />
+              <span>System Online</span>
+            </div>
+          )}
 
           <div ref={titleGroupRef} className="mb-6">
-            <h1 className="text-[clamp(2.2rem,7vw,6.5rem)] leading-none font-black glow-text relative break-words uppercase tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-              <ScrambleText text="ROUSHAN" delay={1200} />
-            </h1>
-            <h1 className="text-[clamp(2.2rem,7vw,6.5rem)] leading-none font-black glow-text-violet relative break-words uppercase tracking-tighter" style={{ fontFamily: 'Orbitron, sans-serif', marginTop: '-0.05em' }}>
-              <ScrambleText text="KUMAR" delay={1400} />
+            <h1 className={`${isRecruiterMode ? 'text-[#1a1a1a]' : 'text-white glow-text'} text-[clamp(2.5rem,8vw,7rem)] leading-none font-black relative break-words tracking-tighter uppercase font-space`}>
+              Roushan Kumar
             </h1>
           </div>
 
-          <p ref={subtitleRef} className="text-sm md:text-base lg:text-lg text-[#4dadeb] mb-8 font-bold tracking-[0.15em] uppercase" style={{ fontFamily: 'Share Tech Mono, monospace', textShadow: '0 0 10px rgba(77, 173, 235, 0.5)' }}>
-            &gt; <ScrambleText text="BCA Student | Python & AI Developer" delay={1600} /> _
+          <p ref={subtitleRef} className={`text-sm md:text-base lg:text-lg mb-8 font-bold tracking-[0.2em] uppercase font-space ${isRecruiterMode ? 'text-[#444]' : 'text-[var(--neon-cyan)]'}`}>
+            &gt; BCA Student | Python & AI Developer _
           </p>
 
-          <p ref={descRef} className="text-[#e5e4e2] text-sm md:text-base mb-12 max-w-2xl lg:mx-0 leading-relaxed opacity-80 backdrop-blur-sm p-4 rounded-xl border border-[rgba(191,148,255,0.15)] bg-[rgba(5,5,10,0.6)]">
-            Building scalable web apps and intelligent systems. Passionate about exploring the intersection of code, computational logic, and neural creativity.
+          <p ref={descRef} className={`text-sm md:text-base mb-12 max-w-2xl leading-relaxed font-inter ${isRecruiterMode ? 'text-[#333] border-l-4 border-[var(--neon-cyan)] pl-6 text-left mx-auto' : 'text-[#e5e4e2] opacity-80 backdrop-blur-sm p-6 rounded-2xl border border-white/5 bg-black/40'} lg:mx-0`}>
+            I build scalable web applications and AI-powered systems focused on performance and real-world impact.
           </p>
 
-          <div ref={ctaRef} className="flex gap-4 md:gap-6 justify-center lg:justify-start flex-wrap pointer-events-auto">
-            <button onClick={() => scrollToSection('projects')} className="btn-primary group flex items-center gap-3 text-xs md:text-base font-orbitron font-bold">
+          <div ref={ctaRef} className={`flex gap-4 md:gap-6 justify-center ${isRecruiterMode ? 'justify-center' : 'lg:justify-start'} flex-wrap`}>
+            <button onClick={() => scrollToSection('projects')} className="btn-primary flex items-center gap-3">
               View Projects
-              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform" />
+              <ArrowRight className="w-4 h-4" />
             </button>
             <button 
               onClick={() => scrollToSection('contact')} 
-              className="btn-secondary flex items-center gap-2 text-xs md:text-base font-orbitron font-bold"
+              className="btn-secondary flex items-center gap-2"
             >
               <MessageSquare className="w-4 h-4" />
               Contact Me
@@ -110,13 +113,15 @@ function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="animate-bounce">
-          <svg className="w-6 h-6 md:w-8 md:h-8 text-[#00f5ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 5px #00f5ff)' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
+      {!isRecruiterMode && (
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 transition-opacity focus-fade">
+          <div className="animate-bounce">
+            <svg className="w-6 h-6 text-[var(--neon-cyan)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 5px var(--neon-cyan))' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
@@ -124,6 +129,7 @@ function HeroSection() {
 
 
 function ProjectsSection() {
+  const { isRecruiterMode } = useMode();
   const sectionRef = use3DScroll() as React.RefObject<HTMLDivElement>;
 
   const projects = [
@@ -157,14 +163,18 @@ function ProjectsSection() {
   ];
 
   return (
-    <section id="projects" ref={sectionRef} className="py-32 px-4 relative z-10 border-t border-[rgba(0,245,255,0.2)] bg-[rgba(0,0,0,0.4)]">
+    <section id="projects" ref={sectionRef} className={`py-32 px-4 relative z-10 ${isRecruiterMode ? 'bg-white border-none' : 'border-t border-white/5 bg-black/40'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <SplitTextGlow text="COMPILED PROJECTS" className="text-4xl md:text-6xl font-black mb-4 justify-center" colorType="secondary" />
-          <p className="text-[#00f5ff] text-lg font-mono tracking-widest uppercase">System Architecture Showcase</p>
+          {isRecruiterMode ? (
+            <h2 className="text-4xl font-black text-black mb-4 font-space">COMPILED PROJECTS</h2>
+          ) : (
+            <SplitTextGlow text="COMPILED PROJECTS" className="text-4xl md:text-6xl font-black mb-4 justify-center" colorType="secondary" />
+          )}
+          <p className={`${isRecruiterMode ? 'text-gray-500' : 'text-[var(--neon-cyan)]'} text-lg font-mono tracking-widest uppercase`}>System Architecture Showcase</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-10">
+        <div className={`grid ${isRecruiterMode ? 'grid-cols-1' : 'md:grid-cols-2'} gap-10`}>
           {projects.map((project, idx) => (
             <HolographicCard key={idx} index={idx} {...project} />
           ))}
@@ -176,6 +186,7 @@ function ProjectsSection() {
 
 
 function EducationSection() {
+  const { isRecruiterMode } = useMode();
   const sectionRef = use3DScroll() as React.RefObject<HTMLDivElement>;
 
   const education = [
@@ -205,32 +216,29 @@ function EducationSection() {
     },
   ];
 
-  const certs = [
-    { name: 'Gemini University Student', issuer: 'Google for Education', date: '2026' },
-    { name: 'Full-Stack Development', issuer: 'Meta', date: '2022' },
-    { name: 'Database Architecture', issuer: 'Meta', date: '2022' },
-    { name: 'Python Automation', issuer: 'Google', date: '2022' },
-  ];
-
   return (
-    <section id="education" ref={sectionRef} className="neural-border-top py-32 px-4 relative z-10 bg-[rgba(5,5,10,0.4)]">
+    <section id="education" ref={sectionRef} className={`py-32 px-4 relative z-10 ${isRecruiterMode ? 'bg-white border-y border-gray-100' : 'neural-border-top bg-[rgba(5,5,10,0.4)]'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-20">
-          <SplitTextGlow text="DATA TRAINING CENTERS" className="text-4xl md:text-6xl font-black mb-4 justify-center" colorType="secondary" />
-          <p className="text-[#4dadeb] text-lg font-mono tracking-widest uppercase">Academic Archives & Certs</p>
+          {isRecruiterMode ? (
+             <h2 className="text-4xl font-black text-black mb-4 font-space">DATA TRAINING</h2>
+          ) : (
+             <SplitTextGlow text="DATA TRAINING CENTERS" className="text-4xl md:text-6xl font-black mb-4 justify-center" colorType="secondary" />
+          )}
+          <p className={`${isRecruiterMode ? 'text-gray-500' : 'text-[var(--neon-cyan)]'} text-lg font-mono tracking-widest uppercase`}>Academic Archives & Certs</p>
         </div>
 
         <div className="space-y-6 mb-24">
           {education.map((edu, idx) => (
-            <div key={idx} className="card-premium">
+            <div key={idx} className={isRecruiterMode ? 'p-6 border border-gray-100 bg-gray-50 rounded-xl' : 'card-premium'}>
               <div className="flex flex-col md:flex-row justify-between md:items-center">
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'Orbitron, sans-serif' }}>{edu.title}</h3>
-                  <p className="text-[#d1b3ff] font-mono text-sm mb-2">{edu.subtitle}</p>
-                  <p className="text-[#e5e4e2] opacity-70">{edu.school}</p>
+                  <h3 className={`text-xl font-bold mb-1 font-space ${isRecruiterMode ? 'text-black' : 'text-white'}`}>{edu.title}</h3>
+                  <p className={`${isRecruiterMode ? 'text-[var(--neon-cyan)]' : 'text-[var(--neon-purple)]'} font-mono text-sm mb-2`}>{edu.subtitle}</p>
+                  <p className={isRecruiterMode ? 'text-gray-600' : 'text-white opacity-70'}>{edu.school}</p>
                 </div>
                 <div className="mt-4 md:mt-0">
-                  <span className="px-4 py-1 rounded-sm border border-[#4dadeb] text-[#4dadeb] bg-[rgba(77,173,235,0.05)] font-mono text-sm">
+                  <span className={`px-4 py-1 rounded-sm border font-mono text-sm ${isRecruiterMode ? 'border-gray-300 text-gray-500 bg-white' : 'border-[var(--neon-cyan)] text-[var(--neon-cyan)] bg-cyan-500/5'}`}>
                     {edu.date}
                   </span>
                 </div>
@@ -238,32 +246,20 @@ function EducationSection() {
             </div>
           ))}
         </div>
-
-        <div className="text-center">
-          <p className="text-[#d1b3ff] text-lg font-mono tracking-widest uppercase mb-12">Verified Credentials</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {certs.map((cert, idx) => (
-              <div key={idx} className="p-6 border border-[rgba(191,148,255,0.2)] bg-[rgba(191,148,255,0.05)] rounded-lg hover:border-[#bf94ff] transition-all group">
-                <h4 className="text-[#e5e4e2] font-bold mb-2 group-hover:text-[#d1b3ff]">{cert.name}</h4>
-                <p className="text-xs text-[#d1b3ff] uppercase tracking-tighter mb-4">{cert.issuer}</p>
-                <span className="text-[10px] font-mono opacity-50">{cert.date}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );
 }
 
 function StatsSection() {
+  const { isRecruiterMode } = useMode();
   const sectionRef = use3DScroll() as React.RefObject<HTMLDivElement>;
   const counter1Ref = useCounterAnimation(0, 2);
   const counter2Ref = useCounterAnimation(0, 1);
   const counter3Ref = useCounterAnimation(0, 4);
 
   return (
-    <section id="stats" ref={sectionRef} className="neural-border-top py-24 px-4 relative z-10">
+    <section id="stats" ref={sectionRef} className={`py-24 px-4 relative z-10 ${isRecruiterMode ? 'hidden' : 'neural-border-top'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
           {[
@@ -272,7 +268,7 @@ function StatsSection() {
             { ref: counter3Ref, label: 'Architectural Frameworks', suffix: '+' },
           ].map((stat, idx) => (
             <div key={idx} className="card-premium text-center group flex flex-col items-center justify-center py-12">
-              <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00f5ff] to-[#4dadeb] mb-4" style={{ fontFamily: 'Orbitron, sans-serif', filter: 'drop-shadow(0 0 10px rgba(0, 245, 255, 0.4))' }}>
+              <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--neon-cyan)] to-[#4dadeb] mb-4 font-space" style={{ filter: 'drop-shadow(0 0 10px rgba(0, 245, 255, 0.4))' }}>
                 <span ref={stat.ref}>0</span>
                 {stat.suffix}
               </div>
@@ -286,66 +282,49 @@ function StatsSection() {
 }
 
 function ContactSection() {
+  const { isRecruiterMode } = useMode();
   const sectionRef = use3DScroll() as React.RefObject<HTMLDivElement>;
 
   return (
-    <section id="contact" ref={sectionRef} className="neural-border-top py-40 px-4 relative z-10 bg-black/80">
+    <section id="contact" ref={sectionRef} className={`py-40 px-4 relative z-10 ${isRecruiterMode ? 'bg-white' : 'neural-border-top bg-black/80'}`}>
       <div className="max-w-6xl mx-auto text-center">
         {/* Terminal Header */}
         <div className="mb-24 relative inline-block">
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-transparent to-[#bf94ff]" />
-          <SplitTextGlow text="INITIATE UPLINK" className="text-5xl md:text-8xl font-black mb-6 justify-center tracking-tighter" colorType="primary" />
-          <div className="flex items-center justify-center gap-4 text-[#bf94ff] font-mono text-xs uppercase tracking-[0.4em]">
+          {!isRecruiterMode && (
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-px h-12 bg-gradient-to-b from-transparent to-[var(--neon-purple)]" />
+          )}
+          {isRecruiterMode ? (
+             <h2 className="text-4xl font-black text-black mb-6 font-space uppercase">INITIATE CONTACT</h2>
+          ) : (
+             <SplitTextGlow text="INITIATE UPLINK" className="text-5xl md:text-8xl font-black mb-6 justify-center tracking-tighter" colorType="primary" />
+          )}
+          <div className={`flex items-center justify-center gap-4 font-mono text-xs uppercase tracking-[0.4em] ${isRecruiterMode ? 'text-gray-400' : 'text-[var(--neon-purple)]'}`}>
             <span className="animate-pulse">●</span>
             SYSTEM_STATUS: NODE_READY
             <span className="animate-pulse">●</span>
           </div>
         </div>
 
-        {/* Neural Nexus Socials (The Orbital Logic) */}
+        {/* Neural Nexus Socials */}
         <div className="mb-32">
           <NeuralNexusSocials />
         </div>
 
-        {/* Global Transmission Terminal (The Form) */}
+        {/* Global Transmission Terminal */}
         <div className="max-w-3xl mx-auto relative group">
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-            <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Transmission_Port: 8080</span>
-            <div className="w-px h-12 bg-gradient-to-t from-transparent via-[#bf94ff]/20 to-transparent" />
-          </div>
-          
-          <h3 className="text-2xl font-bold font-orbitron text-[#e5e4e2] mb-12 tracking-widest uppercase">
-            Global Transmission <span className="text-[#bf94ff]">Terminal</span>
+          <h3 className={`text-2xl font-bold font-space mb-12 tracking-widest uppercase ${isRecruiterMode ? 'text-black' : 'text-[#e5e4e2]'}`}>
+            Global Transmission <span className="text-[var(--neon-purple)]">Terminal</span>
           </h3>
           
           <NeuralContactForm />
-
-          {/* Bottom Accent */}
-          <div className="mt-20 flex flex-col items-center gap-6 opacity-40 group-hover:opacity-100 transition-opacity duration-700">
-            <div className="w-px h-16 bg-gradient-to-b from-[#bf94ff] to-transparent" />
-            <span className="text-[10px] font-mono text-[#bf94ff] uppercase tracking-[0.5em]">End_Of_Transmission</span>
-          </div>
-        </div>
-
-        <div className="mt-32 text-[#4dadeb] font-mono tracking-widest text-sm uppercase">
-          <p>&gt; LOCATION_PING: INDIA_</p>
         </div>
       </div>
     </section>
   );
 }
 
-function NeuralHUD({ 
-  isPerformanceMode, 
-  setIsPerformanceMode, 
-  isOverrideEnabled, 
-  setIsOverrideEnabled 
-}: { 
-  isPerformanceMode: boolean, 
-  setIsPerformanceMode: (v: boolean) => void,
-  isOverrideEnabled: boolean,
-  setIsOverrideEnabled: (v: boolean) => void
-}) {
+function NeuralHUD() {
+  const { isPerformanceMode, setIsPerformanceMode, isRecruiterMode } = useMode();
   const [fps, setFps] = useState(60);
   const [latency, setLatency] = useState(24);
   const [memory, setMemory] = useState(128);
@@ -367,7 +346,7 @@ function NeuralHUD({
     const reqId = requestAnimationFrame(updateFPS);
 
     const interval = setInterval(() => {
-      setLatency(31 + Math.floor(Math.random() * 5));
+      setLatency(12 + Math.floor(Math.random() * 5));
       setMemory(Math.floor(Math.random() * 512 + 256));
     }, 2000);
 
@@ -377,65 +356,40 @@ function NeuralHUD({
     };
   }, []);
 
+  if (isRecruiterMode) return null;
+
   return (
     <div className="fixed top-24 right-6 z-50 hidden xl:flex flex-col gap-4">
-      <div className="glass-panel p-4 border border-[rgba(191,148,255,0.2)] bg-black/40 backdrop-blur-md rounded-lg flex flex-col gap-3 min-w-[220px] pointer-events-auto">
-        <div className="flex items-center justify-between border-b border-[rgba(191,148,255,0.1)] pb-2 mb-1">
-          <span className="text-[10px] font-mono text-[#4dadeb] tracking-wider uppercase">Neural_Uplink_Sync</span>
+      <div className="glass-panel p-4 border border-white/10 bg-black/40 backdrop-blur-md rounded-2xl flex flex-col gap-3 min-w-[220px] pointer-events-auto shadow-2xl">
+        <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-1">
+          <span className="text-[10px] font-mono text-[var(--neon-cyan)] tracking-wider uppercase">Neural_Uplink</span>
           <div className="flex items-center gap-2">
             <span className="text-[9px] font-mono text-white/40">{fps} FPS</span>
-            <div className={`w-2 h-2 rounded-full ${fps > 55 ? 'bg-[#bf94ff]' : 'bg-yellow-500'} animate-pulse`} style={{ boxShadow: fps > 55 ? '0 0 10px #bf94ff' : 'none' }} />
+            <div className={`w-2 h-2 rounded-full ${fps > 55 ? 'bg-[var(--neon-cyan)]' : 'bg-yellow-500'} animate-pulse`} style={{ boxShadow: fps > 55 ? '0 0 10px var(--neon-cyan)' : 'none' }} />
           </div>
         </div>
         
         <div className="space-y-2">
           <div className="flex justify-between items-center text-[9px] font-mono">
             <span className="text-white/60">LATENCY_MS</span>
-            <span className="text-[#bf94ff]">{latency}.002ms</span>
+            <span className="text-[var(--neon-cyan)]">{latency}.002ms</span>
           </div>
-          <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
-            <div className="bg-[#bf94ff] h-full transition-all duration-1000" style={{ width: `${(latency / 100) * 100}%` }} />
-          </div>
-
           <div className="flex justify-between items-center text-[9px] font-mono">
             <span className="text-white/60">AETHER_POOL</span>
-            <span className="text-[#4dadeb]">{memory} MB</span>
-          </div>
-          <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
-            <div className="bg-[#4dadeb] h-full transition-all duration-1000" style={{ width: `${(memory / 1024) * 100}%` }} />
+            <span className="text-[var(--neon-purple)]">{memory} MB</span>
           </div>
         </div>
 
         {/* HUD Controls */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
+        <div className="pt-2">
           <button 
             onClick={() => setIsPerformanceMode(!isPerformanceMode)}
-            className={`text-[8px] font-mono border py-1 rounded transition-all ${isPerformanceMode ? 'border-[#00f5ff] text-[#00f5ff] bg-[#00f5ff]/10' : 'border-white/20 text-white/40'}`}
+            className={`w-full text-[8px] font-mono border py-2 rounded-lg transition-all flex items-center justify-center gap-2 ${isPerformanceMode ? 'border-[var(--neon-cyan)] text-[var(--neon-cyan)] bg-[var(--neon-cyan)]/10' : 'border-white/10 text-white/40'}`}
           >
-            {isPerformanceMode ? 'MAX_PERF' : 'ECO_MODE'}
-          </button>
-          <button 
-            onClick={() => setIsOverrideEnabled(!isOverrideEnabled)}
-            className={`text-[8px] font-mono border py-1 rounded transition-all ${isOverrideEnabled ? 'border-[#bf94ff] text-[#bf94ff] bg-[#bf94ff]/10 animate-pulse' : 'border-white/20 text-white/40 hover:border-[#4dadeb] hover:text-[#4dadeb]'}`}
-          >
-            {isOverrideEnabled ? 'ACTIVE' : 'OVERRIDE'}
+            <Zap className="w-3 h-3" />
+            {isPerformanceMode ? 'PEAK_PERFORMANCE' : 'ECO_MODE_ACTIVE'}
           </button>
         </div>
-
-        <div className="pt-2 flex flex-col gap-1 border-t border-white/5 mt-1">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-1 bg-[#bf94ff] rounded-full" />
-            <span className="text-[8px] font-mono text-white/40 uppercase">Kernel_v4.0.0_Singularity</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-1 bg-[#4dadeb] rounded-full" />
-            <span className="text-[8px] font-mono text-white/40 uppercase">GPGPU_Active_State</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="glass-panel p-2 border border-[rgba(191,148,255,0.1)] bg-black/20 backdrop-blur-sm rounded-md self-end pointer-events-none">
-        <span className="text-[8px] font-mono text-[#bf94ff] uppercase tracking-[0.2em] animate-pulse">Scanning Grid...</span>
       </div>
     </div>
   );
@@ -443,20 +397,24 @@ function NeuralHUD({
 
 export default function Home() {
   const isMobile = useIsMobile();
+  const { isPerformanceMode, isRecruiterMode } = useMode();
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
-  const [isPerformanceMode, setIsPerformanceMode] = useState(true);
-  const [isOverrideEnabled, setIsOverrideEnabled] = useState(false);
-
-  useEffect(() => {
-    // Auto-enable eco mode on mobile
-    if (isMobile) {
-      setIsPerformanceMode(false);
-    }
-  }, [isMobile]);
 
   useEffect(() => {
     (window as any).openResumeScan = () => setIsResumeModalOpen(true);
-  }, []);
+    
+    // GSAP ScrollTrigger for Focus Mode
+    if (!isRecruiterMode) {
+      ScrollTrigger.create({
+        trigger: ".avatar-container",
+        start: "top top",
+        end: "bottom center",
+        onUpdate: (self) => {
+          gsap.to(".avatar-container, .focus-fade", { opacity: 1 - self.progress, duration: 0.5 });
+        }
+      });
+    }
+  }, [isRecruiterMode]);
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -469,49 +427,47 @@ export default function Home() {
   };
 
   return (
-    <main className={`relative bg-[#000000] text-[#e5e4e2] min-h-screen overflow-x-hidden selection:bg-[#bf94ff]/30 selection:text-white transition-all duration-700 ${isOverrideEnabled ? 'hue-rotate-[15deg] brightness-[1.1]' : ''}`}>
-      {/* <CyberpunkNeon /> */}
-      
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-100">
-        <Suspense fallback={null}>
-          <CombinedScene 
-            forceGlitch={isOverrideEnabled ? 2.5 : 0} 
-            forceSingularity={isOverrideEnabled ? 1.0 : 0}
-            ecoMode={!isPerformanceMode}
-          />
-        </Suspense>
-      </div>
+    <main className={`relative ${isRecruiterMode ? 'bg-white' : 'bg-[#020205]'} text-[#e5e4e2] min-h-screen overflow-x-hidden selection:bg-[var(--neon-purple)]/30 transition-colors duration-700`}>
+      {!isRecruiterMode && (
+        <div className="fixed inset-0 z-0 pointer-events-none opacity-100 backdrop-noise">
+          {!isPerformanceMode && (
+            <Suspense fallback={null}>
+              <CombinedScene 
+                ecoMode={isPerformanceMode}
+              />
+            </Suspense>
+          )}
+        </div>
+      )}
 
       <div className="relative z-10">
         <Navigation />
-        {!isMobile && (
-          <NeuralHUD 
-            isPerformanceMode={isPerformanceMode} 
-            setIsPerformanceMode={setIsPerformanceMode}
-            isOverrideEnabled={isOverrideEnabled}
-            setIsOverrideEnabled={setIsOverrideEnabled}
-          />
-        )}
+        {!isMobile && <NeuralHUD />}
+        
         <HeroSection />
         
-        <div className="neural-border-top py-12">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <SplitTextGlow text="NEURAL JOURNEY" className="text-3xl md:text-5xl font-black mb-4 justify-center" colorType="primary" />
-            <p className="text-[#d1b3ff] text-xs font-mono tracking-[0.3em] uppercase opacity-60">Authentication & Growth History</p>
+        {!isRecruiterMode && (
+          <div className="neural-border-top py-12">
+            <div className="max-w-4xl mx-auto px-4 text-center">
+              <SplitTextGlow text="NEURAL JOURNEY" className="text-3xl md:text-5xl font-black mb-4 justify-center" colorType="primary" />
+              <p className="text-[#d1b3ff] text-xs font-mono tracking-[0.3em] uppercase opacity-60">Authentication & Growth History</p>
+            </div>
+            <Suspense fallback={<div className="py-20 text-center text-white/20 font-mono text-xs">HYDRATING...</div>}>
+              <NeuralTimeline />
+            </Suspense>
           </div>
-          <Suspense fallback={<div className="py-20 text-center text-white/20 font-mono text-xs">HYDRATING_TIMELINE...</div>}>
-            <NeuralTimeline />
-          </Suspense>
-        </div>
+        )}
 
-        <section id="projects" className="neural-border-top py-32 px-4 relative z-10 bg-[rgba(0,0,0,0.4)]">
-          <ProjectsSection />
-        </section>
-        <Suspense fallback={null}>
-          <TacticalArsenal />
-        </Suspense>
+        <ProjectsSection />
+        
+        {!isRecruiterMode && (
+          <Suspense fallback={null}>
+            <TacticalArsenal />
+          </Suspense>
+        )}
+        
         <EducationSection />
-        <StatsSection />
+        {!isRecruiterMode && <StatsSection />}
         <ContactSection />
         <Footer />
       </div>

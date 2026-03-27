@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -30,41 +31,22 @@
 }
 
 :root {
-  /* Stellar Void Theme - Galactic x Premium x Sophisticated */
-  --stellar-black: #000000;
-  --deep-space: #050505;
-  --electric-violet: #bf94ff;
-  --stellar-purple: #7d5fff;
-  --aurora-blue: #4dadeb;
-  --platinum: #e5e4e2;
-  --soft-lavender: #d1b3ff;
-  --glass-bg: rgba(5, 5, 10, 0.7);
-  --glass-border: rgba(191, 148, 255, 0.2);
-
-  --background: var(--stellar-black);
-  --foreground: var(--platinum);
-  --card: rgba(10, 10, 15, 0.8);
-  --card-foreground: var(--platinum);
-  --popover: var(--deep-space);
-  --popover-foreground: var(--platinum);
+  /* Intelligent Design System - Astra Professional */
+  --neon-cyan: #00F5FF;
+  --neon-purple: #8A2BE2;
+  --neon-gold: #FFD700;
+  --deep-void: #020205;
+  --surface-glow: rgba(0, 245, 255, 0.03);
   
-  --primary: var(--electric-violet);
-  --primary-foreground: #ffffff;
-  --secondary: var(--stellar-purple);
-  --secondary-foreground: #ffffff;
+  --background: var(--deep-void);
+  --foreground: #e5e4e2;
   
-  --muted: rgba(191, 148, 255, 0.05);
-  --muted-foreground: var(--soft-lavender);
+  --primary: var(--neon-cyan);
+  --secondary: var(--neon-purple);
+  --accent: var(--neon-gold);
   
-  --accent: var(--aurora-blue);
-  --accent-foreground: #ffffff;
-  
-  --destructive: #ff3b3b;
-  --destructive-foreground: #ffffff;
-  
-  --border: var(--glass-border);
-  --input: rgba(10, 10, 15, 0.5);
-  --ring: var(--electric-violet);
+  --glass-border: rgba(0, 245, 255, 0.1);
+  --glass-bg: rgba(2, 2, 5, 0.8);
   
   --radius: 0.5rem;
 }
@@ -84,11 +66,15 @@ html {
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: 'Share Tech Mono', 'Inter', monospace;
+    font-family: 'Inter', sans-serif;
+    /* Layered Gradient Mix */
     background-image: 
-      radial-gradient(circle at 15% 50%, rgba(191, 148, 255, 0.08), transparent 25%),
-      radial-gradient(circle at 85% 30%, rgba(125, 95, 255, 0.08), transparent 25%);
+      radial-gradient(circle at 0% 0%, rgba(138, 43, 226, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(0, 245, 255, 0.05) 0%, transparent 50%),
+      linear-gradient(to bottom, var(--deep-void) 0%, #050508 100%);
+    background-attachment: fixed;
     overflow-x: hidden;
+    line-height: 1.6;
   }
   
   /* Stellar Scanline global overlay - Lowered z-index and kept purely decorative */
@@ -122,35 +108,53 @@ html {
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
   }
   
   .glow-text {
     color: #fff;
-    text-shadow: 
-      0 0 5px #fff,
-      0 0 10px rgba(191, 148, 255, 0.8),
-      0 0 20px var(--electric-violet),
-      0 0 40px var(--stellar-purple),
-      0 0 80px var(--stellar-purple);
+    text-shadow: none;
+    transition: text-shadow 0.3s ease;
   }
   
-  .glow-text-subtle {
-    color: var(--platinum);
-    text-shadow: 0 0 20px rgba(191, 148, 255, 0.4);
+  /* Interaction-Based Glow Logic */
+  .glow-text:hover {
+    text-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
   }
 
-  .glow-text-violet {
-    color: #fff;
-    text-shadow: 
-      0 0 5px #fff,
-      0 0 10px rgba(125, 95, 255, 0.8),
-      0 0 20px var(--soft-lavender),
-      0 0 40px var(--electric-violet),
-      0 0 80px var(--electric-violet);
+  .glow-text-secondary:hover {
+    text-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+  }
+
+  /* Global Mode Overrides */
+  .perf-mode * {
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+    animation-duration: 0.1s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .recruiter-mode {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+
+  .recruiter-mode body {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #1a1a1a !important;
+  }
+
+  .recruiter-mode .glow-text,
+  .recruiter-mode .btn-primary,
+  .recruiter-mode .btn-secondary {
+    text-shadow: none !important;
+    box-shadow: none !important;
+    background: #f3f4f6 !important;
+    color: #000 !important;
+    border-color: #e5e7eb !important;
   }
   
   @keyframes floatUp {

@@ -2,10 +2,12 @@ import * as THREE from 'three';
 import { AdditiveBlending } from 'three';
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { ASTRA_SYSTEM_PROMPT, ASTRA_QUICK_CHIPS } from '@/data/astraData';
-import { X, Send, Copy, Check, ChevronDown, Sparkles, Brain, Cpu, ShieldCheck } from 'lucide-react';
+import { X, Send, Copy, Check, ChevronDown, Sparkles, Brain, Cpu, ShieldCheck, Rocket, FileText, MessageCircle, Briefcase } from 'lucide-react';
 import gsap from 'gsap';
 import { useAstraVoice } from '@/hooks/useAstraVoice';
 import { useIsMobile } from '@/hooks/useMobile';
+import { useMode } from '@/contexts/ModeContext';
+import { Canvas, useFrame } from '@react-three/fiber';
 
 // --- Types ---
 interface Message {
@@ -16,101 +18,64 @@ interface Message {
 
 // --- Constants ---
 const MAX_REQUESTS_PER_DAY = 1200;
-const SESSION_CACHE_KEY_PREFIX = 'astra_cache_v2_';
-const USAGE_TRACKER_KEY = 'astra_usage_tracker';
+const SESSION_CACHE_KEY_PREFIX = 'astra_cache_v3_';
+const USAGE_TRACKER_KEY = 'astra_usage_tracker_v3';
 
-import { Canvas, useFrame } from '@react-three/fiber';
-
-// --- Reactive Lifeform Core (v2.0 - Crystalline Icosahedron) ---
-const ReactiveAstraCore = ({ isOpen, globalMouse, isMobile }: { isOpen: boolean, globalMouse: React.MutableRefObject<THREE.Vector2>, isMobile: boolean }) => {
+// --- Reactive Lifeform Core (v3.0 - Optimized) ---
+const ReactiveAstraCore = ({ isOpen, globalMouse, isMobile, isPerformanceMode }: { isOpen: boolean, globalMouse: React.MutableRefObject<THREE.Vector2>, isMobile: boolean, isPerformanceMode: boolean }) => {
   const groupRef = useRef<THREE.Group>(null!);
   const shellRef = useRef<THREE.Mesh>(null!);
-  const knotRef = useRef<THREE.Mesh>(null!);
   const coreRef = useRef<THREE.Mesh>(null!);
   
-  // Physics States
-  const currentPos = useRef(new THREE.Vector3(0, 0, 0));
-  const velocity = useRef(new THREE.Vector3(0, 0, 0));
-  const mouseLast = useRef(new THREE.Vector2(0, 0));
-  
-  useFrame((state, delta) => {
+  useFrame((state) => {
+    if (isPerformanceMode) return;
     const t = state.clock.elapsedTime;
     const mousePos = globalMouse.current;
 
-    // 1. Subtle Tilt Effect (Safe & Atmospheric)
-    const targetRotationX = -mousePos.y * 0.2;
-    const targetRotationY = mousePos.x * 0.2;
-    
     if (groupRef.current) {
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotationX, 0.1);
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotationY, 0.1);
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -mousePos.y * 0.3, 0.1);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, mousePos.x * 0.3, 0.1);
     }
 
-    // 2. Autonomous Multi-Axis Rotations
     if (shellRef.current) {
-      shellRef.current.rotation.y = t * 0.4;
-      shellRef.current.rotation.z = Math.sin(t * 0.5) * 0.2;
+      shellRef.current.rotation.y = t * 0.5;
     }
     
-    if (knotRef.current) {
-      knotRef.current.rotation.z = -t * 0.6;
-      knotRef.current.rotation.x = Math.cos(t * 0.4) * 0.3;
-    }
-
-    // 3. "Neural Breathing" Pulse
-    if (coreRef.current && !isMobile) {
-      const pulse = 1 + Math.sin(t * 2.5) * 0.08; // Slower, rhythmic breath
+    if (coreRef.current) {
+      const pulse = 1 + Math.sin(t * 3) * 0.1;
       coreRef.current.scale.setScalar(pulse);
     }
   });
 
-  if (isMobile) {
+  if (isPerformanceMode) {
     return (
-      <group>
-        <mesh>
-          <icosahedronGeometry args={[0.2, 0]} />
-          <meshBasicMaterial color="#ffffff" />
-        </mesh>
-        <mesh scale={1.4}>
-          <icosahedronGeometry args={[0.22, 1]} />
-          <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.3} />
-        </mesh>
-      </group>
+      <mesh>
+        <sphereGeometry args={[0.3, 32, 32]} />
+        <meshBasicMaterial color="#00f5ff" transparent opacity={0.8} />
+      </mesh>
     );
   }
 
   return (
     <group ref={groupRef}>
-      {/* Inner Core: Glowing Crystalline Center */}
       <mesh ref={coreRef}>
-        <icosahedronGeometry args={[0.18, 0]} />
-        <meshBasicMaterial color="#ffffff" toneMapped={false} />
-        <pointLight intensity={3} color="#00f5ff" distance={5} />
+        <icosahedronGeometry args={[0.2, 0]} />
+        <meshBasicMaterial color="#ffffff" />
+        <pointLight intensity={2} color="#00f5ff" distance={5} />
       </mesh>
       
-      {/* Outer Shell: Wireframe Architecture */}
-      <mesh ref={shellRef} scale={1.35}>
-        <icosahedronGeometry args={[0.22, 1]} />
-        <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.4} blending={AdditiveBlending} />
+      <mesh ref={shellRef} scale={1.4}>
+        <icosahedronGeometry args={[0.25, 1]} />
+        <meshBasicMaterial color="#00f5ff" wireframe transparent opacity={0.3} blending={AdditiveBlending} />
       </mesh>
-
-      {/* Orbital Knots: Data Streams */}
-      <group rotation={[Math.PI / 4, 0, 0]}>
-        <mesh ref={knotRef}>
-          <torusKnotGeometry args={[0.55, 0.008, 128, 16, 2, 3]} />
-          <meshBasicMaterial color="#bf94ff" transparent opacity={0.7} blending={AdditiveBlending} />
-        </mesh>
-        <mesh rotation={[Math.PI / 2, 0, 0]} scale={0.9}>
-          <torusKnotGeometry args={[0.65, 0.005, 128, 16, 3, 4]} />
-          <meshBasicMaterial color="#4dadeb" transparent opacity={0.3} blending={AdditiveBlending} />
-        </mesh>
-      </group>
     </group>
   );
 };
 
 const AstraLogo = ({ isOpen }: { isOpen: boolean }) => {
+  const { isPerformanceMode } = useMode();
   const globalMouse = useRef(new THREE.Vector2(0, 0));
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -124,348 +89,249 @@ const AstraLogo = ({ isOpen }: { isOpen: boolean }) => {
   }, []);
 
   return (
-    <div className="relative w-16 h-16 flex items-center justify-center cursor-pointer pointer-events-auto group">
-      <div className="w-24 h-24 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+    <div className={`relative ${isMobile ? 'w-12 h-12' : 'w-16 h-16'} flex items-center justify-center cursor-pointer pointer-events-auto group`}>
+      <div className={`${isMobile ? 'w-16 h-16' : 'w-24 h-24'} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10`}>
         <Canvas 
           camera={{ position: [0, 0, 5], fov: 35 }}
-          gl={{ alpha: true, antialias: true }}
+          gl={{ alpha: true }}
           style={{ pointerEvents: 'none' }}
         >
-          <ambientLight intensity={0.5} />
-          <ReactiveAstraCore isOpen={isOpen} globalMouse={globalMouse} isMobile={useIsMobile()} />
+          <ReactiveAstraCore isOpen={isOpen} globalMouse={globalMouse} isMobile={isMobile} isPerformanceMode={isPerformanceMode} />
         </Canvas>
       </div>
   
-      {/* Status Indicator */}
       {!isOpen && (
-        <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-[#00f5ff] rounded-full border border-black shadow-[0_0_8px_#00f5ff] z-20" />
+        <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-[#00f5ff] rounded-full border border-black shadow-[0_0_8px_#00f5ff] z-20 animate-pulse" />
       )}
     </div>
   );
 };
 
 export function AstraAssistant() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isAstraOpen: isOpen, setIsAstraOpen: setIsOpen, isPerformanceMode, isRecruiterMode } = useMode();
   const [messages, setMessages] = useState<Message[]>([{
     role: 'assistant',
-    content: "Greetings. I am **ASTRA** — *Astreon's Synthetic Terminal & Research Assistant*. I am Roushan's custom neural interface. I can provide intel on his architecture, projects, or assist with any complex queries. How shall we proceed?",
+    content: "Greetings. I am **ASTRA**. I can provide technical intel on Roushan's architecture or provide his resume. How shall we proceed?",
     id: 'welcome',
   }]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const { speak, stop, enabled: voiceEnabled } = useAstraVoice();
+  const { speak, stop } = useAstraVoice();
   const isMobile = useIsMobile();
 
-  // Voice effect for new messages
-  useEffect(() => {
-    if (!isStreaming && messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg.role === 'assistant' && lastMsg.content && lastMsg.id !== 'welcome') {
-        speak(lastMsg.content);
-      }
+  const handleAction = (type: string) => {
+    switch(type) {
+      case 'projects':
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+        setIsOpen(false);
+        break;
+      case 'contact':
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+        setIsOpen(false);
+        break;
+      case 'resume':
+        const link = document.createElement('a');
+        link.href = '/resume.pdf';
+        link.download = 'Roushan_Kumar_Resume.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        break;
     }
-  }, [isStreaming, speak]);
+  };
 
-  // --- Rate Limiting Logic ---
   const getUsage = () => {
     const data = localStorage.getItem(USAGE_TRACKER_KEY);
     if (!data) return { count: 0, date: new Date().toDateString() };
     const parsed = JSON.parse(data);
-    if (parsed.date !== new Date().toDateString()) {
-      return { count: 0, date: new Date().toDateString() };
-    }
-    return parsed;
+    return parsed.date !== new Date().toDateString() ? { count: 0, date: new Date().toDateString() } : parsed;
   };
 
   const incrementUsage = () => {
     const usage = getUsage();
-    localStorage.setItem(USAGE_TRACKER_KEY, JSON.stringify({
-      count: usage.count + 1,
-      date: usage.date
-    }));
+    localStorage.setItem(USAGE_TRACKER_KEY, JSON.stringify({ count: usage.count + 1, date: usage.date }));
   };
-
-  // --- Caching Logic ---
-  const getCachedResponse = (text: string) => {
-    const key = SESSION_CACHE_KEY_PREFIX + btoa(text.trim().toLowerCase()).slice(0, 32);
-    return sessionStorage.getItem(key);
-  };
-
-  const setCachedResponse = (text: string, response: string) => {
-    const key = SESSION_CACHE_KEY_PREFIX + btoa(text.trim().toLowerCase()).slice(0, 32);
-    sessionStorage.setItem(key, response);
-  };
-
-  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
-  };
-
-  useEffect(() => {
-    scrollToBottom(isStreaming ? 'auto' : 'smooth');
-  }, [messages, isStreaming]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
 
   const sendMessage = useCallback(async (userText: string) => {
     const trimmed = userText.trim();
     if (!trimmed || isStreaming) return;
 
-    // Check Rate Limit
     const usage = getUsage();
     if (usage.count >= MAX_REQUESTS_PER_DAY) {
       setMessages(prev => [...prev, 
         { role: 'user', content: trimmed, id: Date.now().toString() },
-        { role: 'assistant', content: "⚠️ **Daily Limit Reached**: System protocols permit 1200 transmissions per 24 hours. Limit reset in several hours.", id: (Date.now() + 1).toString() }
+        { role: 'assistant', content: "⚠️ **Daily Limit Reached**.", id: (Date.now() + 1).toString() }
       ]);
       return;
     }
 
-    const userMsg: Message = { role: 'user', content: trimmed, id: Date.now().toString() };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(prev => [...prev, { role: 'user', content: trimmed, id: Date.now().toString() }]);
     setInput('');
     setIsStreaming(true);
 
     const assistantId = (Date.now() + 1).toString();
     setMessages(prev => [...prev, { role: 'assistant', content: '', id: assistantId }]);
 
-    // Check Cache
-    const cached = getCachedResponse(trimmed);
-    if (cached) {
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < cached.length) {
-          const chunk = cached.slice(i, i + 8);
-          setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: m.content + chunk } : m));
-          i += 8;
-        } else {
-          clearInterval(interval);
-          setIsStreaming(false);
-          incrementUsage();
-        }
-      }, 10);
-      return;
-    }
-
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     if (!apiKey) {
-      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: "ERROR: Neural Link Failed. API Key missing." } : m));
+      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: "ERROR: API Key missing." } : m));
       setIsStreaming(false);
       return;
     }
 
-    const controller = new AbortController();
-    abortRef.current = controller;
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.0-flash-exp:free',
+          messages: [
+            { role: 'system', content: ASTRA_SYSTEM_PROMPT },
+            ...messages.slice(-4).map(m => ({ role: m.role, content: m.content })),
+            { role: 'user', content: trimmed }
+          ],
+          stream: true,
+        }),
+      });
 
-    // Waterfall model list: try each in order if prev returns error
-    const MODEL_FALLBACKS = [
-      'google/gemini-2.0-flash-exp:free',
-      'google/gemini-2.0-flash-lite-preview-02-05:free', // Re-adding just in case naming was the issue
-      'meta-llama/llama-3.3-70b-instruct:free',
-      'google/gemma-3-27b-it:free',
-      'deepseek/deepseek-r1:free',
-      'openrouter/auto', // Smart auto-router as last resort
-    ];
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = '';
 
-    let succeeded = false;
-    let fullContent = '';
-
-    for (const model of MODEL_FALLBACKS) {
-      if (controller.signal.aborted) break;
-      
-      try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': window.location.origin,
-            'X-Title': 'ASTRA AI Assistant',
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            model: model,
-            messages: [
-              { role: 'system', content: ASTRA_SYSTEM_PROMPT },
-              ...messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
-              { role: 'user', content: trimmed }
-            ],
-            stream: true,
-          }),
-        });
-
-        if (response.status === 400 || response.status === 404 || response.status === 429) {
-          console.warn(`Model ${model} failed with status ${response.status}. Trying next...`);
-          continue;
-        }
-
-        if (!response.ok) throw new Error('API Sync Failed');
-
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-
-        while (reader) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-          
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6).trim();
-              if (data === '[DONE]') continue;
-              try {
-                const parsed = JSON.parse(data);
-                const content = parsed.choices[0]?.delta?.content || '';
-                fullContent += content;
-                setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: m.content + content } : m));
-              } catch (e) {}
-            }
+      while (reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices[0]?.delta?.content || '';
+              fullContent += content;
+              setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: m.content + content } : m));
+            } catch (e) {}
           }
         }
-
-        if (fullContent) {
-          succeeded = true;
-          setCachedResponse(trimmed, fullContent);
-          incrementUsage();
-          break; // Exit loop on success
-        }
-      } catch (err) {
-        if ((err as Error).name === 'AbortError') break;
-        console.error(`Attempt with ${model} failed:`, err);
-        continue;
       }
+      incrementUsage();
+    } catch (err) {
+      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: "⚠️ Neural Node unreachable." } : m));
     }
-
-    if (!succeeded && !controller.signal.aborted) {
-      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: "⚠️ Connectivity Error. All neural nodes unreachable. Please check API key or network." } : m));
-    }
-
     setIsStreaming(false);
-    abortRef.current = null;
   }, [messages, isStreaming]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage(input);
-    }
-  };
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  if (isRecruiterMode) return null;
 
   return (
     <>
-      {/* Trigger Button */}
-      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-[9999] flex flex-col items-end gap-3`}>
+      {/* Trigger */}
+      <div className={`fixed ${isMobile ? 'bottom-6 right-6 scale-90' : 'bottom-8 right-8'} z-[9999] flex flex-col items-end gap-3`}>
         {!isOpen && !isMobile && (
-          <div className="bg-[#000000]/90 border border-[#00f5ff]/40 px-3 py-1.5 rounded-full text-[10px] font-mono text-[#00f5ff] uppercase tracking-widest backdrop-blur-md animate-pulse shadow-[0_0_10px_rgba(0,245,255,0.2)]">
-            Astra Core Active
+          <div className="px-3 py-1 bg-black/80 border border-[var(--neon-cyan)]/30 rounded-full text-[9px] font-mono text-[var(--neon-cyan)] uppercase tracking-[0.2em] backdrop-blur-md shadow-lg">
+            Astra Active
           </div>
         )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`group p-1 rounded-full border-2 transition-all duration-500 hover:scale-110 active:scale-95 ${isOpen ? 'border-[#d1b3ff] bg-[#bf94ff]/10' : 'border-[#bf94ff] bg-[#000000]'} ${isMobile ? 'scale-75 origin-bottom-right' : ''}`}
-          style={{ boxShadow: isOpen ? '0 0 30px rgba(191,148,255,0.4)' : '0 0 15px rgba(191,148,255,0.2)' }}
+          className={`relative p-1 rounded-full border-2 transition-all duration-500 scale-hover ${isOpen ? 'border-[var(--neon-purple)] bg-black' : 'border-[var(--neon-cyan)] bg-black'}`}
+          style={{ boxShadow: isOpen ? '0 0 30px rgba(138, 43, 226, 0.3)' : '0 0 20px rgba(0, 245, 255, 0.2)' }}
         >
-          {isOpen ? <X className={isMobile ? "w-8 h-8 text-[#d1b3ff]" : "w-10 h-10 text-[#d1b3ff]"} /> : <AstraLogo isOpen={isOpen} />}
+          {isOpen ? <X className="w-10 h-10 text-[var(--neon-purple)] p-2" /> : <AstraLogo isOpen={isOpen} />}
         </button>
       </div>
 
-      {/* Main Panel */}
+      {/* Interface Panel */}
       {isOpen && (
-        <div 
-          onWheel={(e) => e.stopPropagation()}
-          className="fixed bottom-24 right-6 w-[min(420px,calc(100vw-3rem))] h-[min(650px,calc(100vh-140px))] bg-[#000000]/98 border border-[#bf94ff]/30 rounded-2xl z-[9998] flex flex-col shadow-[0_0_50px_rgba(191,148,255,0.15)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-5 duration-300"
-        >
+        <div className={`fixed ${isMobile ? 'inset-0 z-[10000] rounded-none' : 'bottom-28 right-8 w-96 h-[600px] rounded-3xl'} bg-[#020205]/98 border border-white/10 z-[9998] flex flex-col shadow-2xl backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-5`}>
           {/* Header */}
-          <div className="p-4 border-b border-[#bf94ff]/20 flex items-center justify-between bg-gradient-to-r from-[#bf94ff]/5 to-transparent">
+          <div className="p-5 border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border border-[#bf94ff]/40 flex items-center justify-center bg-[#bf94ff]/10">
-                <Brain className="w-5 h-5 text-[#d1b3ff]" />
+              <div className="w-8 h-8 rounded-full bg-[var(--neon-cyan)]/10 flex items-center justify-center">
+                <Brain className="w-4 h-4 text-[var(--neon-cyan)]" />
               </div>
-              <div>
-                <h3 className="text-sm font-black font-orbitron text-white tracking-widest uppercase">ASTRA CORE</h3>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-[#4dadeb] rounded-full animate-pulse shadow-[0_0_5px_#4dadeb]" />
-                  <span className="text-[9px] font-mono text-[#4dadeb]/60 uppercase tracking-tighter">Neural Link Established</span>
-                </div>
-              </div>
+              <h3 className="text-sm font-black font-space text-white tracking-widest uppercase">ASTRA ASSISTANT</h3>
             </div>
-            <div className="flex gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#4dadeb]/40" />
-            </div>
+            {isMobile && <button onClick={() => setIsOpen(false)}><X className="w-6 h-6 text-white/40" /></button>}
+          </div>
+
+          {/* Quick Action Toolkit */}
+          <div className="p-3 bg-white/5 flex gap-2 overflow-x-auto custom-scrollbar no-scrollbar">
+            <button onClick={() => handleAction('projects')} className="chip-action leading-none"><Rocket className="w-3 h-3" /> Projects</button>
+            <button onClick={() => handleAction('resume')} className="chip-action leading-none"><FileText className="w-3 h-3" /> Resume</button>
+            <button onClick={() => handleAction('contact')} className="chip-action leading-none"><MessageCircle className="w-3 h-3" /> Contact</button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto relative p-4 space-y-4 overscroll-contain custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3.5 rounded-2xl text-sm leading-relaxed ${
-                  msg.role === 'user' 
-                  ? 'bg-gradient-to-br from-[#bf94ff]/20 to-[#7d5fff]/10 border border-[#bf94ff]/30 text-white rounded-br-none' 
-                  : 'bg-white/5 border border-white/10 text-white/90 rounded-bl-none'
+                <div className={`max-w-[85%] p-4 rounded-2xl text-[11px] md:text-xs leading-relaxed ${
+                  msg.role === 'user' ? 'bg-[var(--neon-purple)]/20 text-white border border-[var(--neon-purple)]/30' : 'bg-white/5 text-white/80 border border-white/5'
                 }`}>
-                  {msg.content ? (
-                    <div className="whitespace-pre-wrap break-words">{msg.content}</div>
-                  ) : (
-                    <div className="flex gap-1.5 py-2 px-1">
-                      {[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 bg-[#00f5ff] rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />)}
-                    </div>
-                  )}
+                  <div className="whitespace-pre-wrap">{msg.content || '...'}</div>
                 </div>
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Prompt Chips */}
-          {!isStreaming && messages.length < 3 && (
-            <div className="px-4 py-2 flex gap-2 flex-wrap border-t border-white/5 bg-white/[0.02]">
-              {ASTRA_QUICK_CHIPS.slice(0, 3).map(chip => (
-                <button
-                  key={chip.label}
-                  onClick={() => sendMessage(chip.prompt)}
-                  className="px-3 py-1 rounded-full border-[#00f5ff]/20 bg-[#00f5ff]/5 text-[10px] font-mono text-[#00f5ff] hover:bg-[#00f5ff]/20 transition-colors uppercase"
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Input Area */}
-          <div className="p-4 border-t border-[#bf94ff]/20 bg-[#bf94ff]/5 rounded-b-2xl">
-            <div className="relative flex items-end gap-2 bg-black/40 border border-[#bf94ff]/30 rounded-xl p-1.5 focus-within:border-[#d1b3ff] transition-all">
+          <div className="p-5 border-t border-white/5">
+            <div className="relative flex items-center gap-2 bg-white/5 rounded-2xl p-2 border border-white/10 focus-within:border-[var(--neon-cyan)]/40 transition-all">
               <textarea
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Synchronize request..."
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
+                placeholder="Ask Astra..."
                 rows={1}
-                className="flex-1 bg-transparent border-none outline-none text-white text-sm p-2 resize-none max-h-32 custom-scrollbar font-mono placeholder:text-white/20"
+                className="flex-1 bg-transparent border-none outline-none text-white text-xs p-2 resize-none font-mono"
               />
-              <button
+              <button 
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || isStreaming}
-                className={`p-2 rounded-lg transition-all ${input.trim() && !isStreaming ? 'bg-[#bf94ff] text-white shadow-[0_0_15px_#bf94ff]' : 'bg-white/10 text-white/20'}`}
+                className={`p-2 rounded-xl transition-all ${input.trim() ? 'bg-[var(--neon-cyan)] text-black' : 'bg-white/10 text-white/20'}`}
               >
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4" />
               </button>
-            </div>
-            <div className="mt-2 flex justify-between items-center px-1">
-              <span className="text-[8px] font-mono text-white/30 tracking-widest">ENCRYPTION: AES-256</span>
-              <span className="text-[8px] font-mono text-white/30 tracking-widest">{getUsage().count} / 1200 TRANSFERS USED</span>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        .chip-action {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 9999px;
+          color: white;
+          font-family: 'Space Grotesk', sans-serif;
+          font-size: 0.7rem;
+          white-space: nowrap;
+          transition: all 0.3s;
+        }
+        .chip-action:hover {
+          background: var(--neon-cyan);
+          color: black;
+          border-color: var(--neon-cyan);
+        }
+      `}</style>
     </>
   );
 }

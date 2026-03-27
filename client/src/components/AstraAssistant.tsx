@@ -36,42 +36,29 @@ const ReactiveAstraCore = ({ isOpen, globalMouse }: { isOpen: boolean, globalMou
     const t = state.clock.elapsedTime;
     const mousePos = globalMouse.current;
 
-    const mouseVel = mousePos.clone().sub(mouseLast.current);
-    const speed = mouseVel.length() / delta;
-    mouseLast.current.copy(mousePos);
-
-    const targetX = isOpen ? 0 : mousePos.x * 2.2; // Reduced from 2.8
-    const targetY = isOpen ? 0 : mousePos.y * 2.2;
-    const target = new THREE.Vector3(targetX, targetY, 0);
-
-    const springK = 18.0;
-    const damping = 0.68;
+    // 1. Subtle Tilt Effect (Safe & Atmospheric)
+    const targetRotationX = -mousePos.y * 0.2;
+    const targetRotationY = mousePos.x * 0.2;
     
-    const force = new THREE.Vector3().subVectors(target, currentPos.current).multiplyScalar(springK);
-    
-    const dist = target.distanceTo(currentPos.current);
-    if (speed > 4.0 && dist < 1.0) {
-      const repulsion = new THREE.Vector3().subVectors(currentPos.current, target).normalize().multiplyScalar(Math.min(speed * 1.5, 10)); // Capped repulsion
-      force.add(repulsion);
-    }
-
-    velocity.current.add(force.multiplyScalar(delta)).multiplyScalar(damping);
-    currentPos.current.add(velocity.current.multiplyScalar(delta));
-
-    // Spatial Clamping (Stay within container)
-    currentPos.current.x = THREE.MathUtils.clamp(currentPos.current.x, -2.4, 2.4);
-    currentPos.current.y = THREE.MathUtils.clamp(currentPos.current.y, -2.4, 2.4);
-
     if (groupRef.current) {
-      groupRef.current.position.set(currentPos.current.x, currentPos.current.y, currentPos.current.z);
-      groupRef.current.rotation.y = t * 0.5;
-      groupRef.current.rotation.z = Math.sin(t * 0.3) * 0.2;
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotationX, 0.1);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotationY, 0.1);
     }
 
-    if (shellRef.current) shellRef.current.rotation.x = -t * 0.3;
-    if (knotRef.current) knotRef.current.rotation.z = t * 0.8;
+    // 2. Autonomous Multi-Axis Rotations
+    if (shellRef.current) {
+      shellRef.current.rotation.y = t * 0.4;
+      shellRef.current.rotation.z = Math.sin(t * 0.5) * 0.2;
+    }
+    
+    if (knotRef.current) {
+      knotRef.current.rotation.z = -t * 0.6;
+      knotRef.current.rotation.x = Math.cos(t * 0.4) * 0.3;
+    }
+
+    // 3. "Neural Breathing" Pulse
     if (coreRef.current) {
-      const pulse = 1 + Math.sin(t * 6) * 0.15;
+      const pulse = 1 + Math.sin(t * 2.5) * 0.08; // Slower, rhythmic breath
       coreRef.current.scale.setScalar(pulse);
     }
   });

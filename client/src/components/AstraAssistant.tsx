@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { ASTRA_SYSTEM_PROMPT, ASTRA_QUICK_CHIPS } from '@/data/astraData';
 import { X, Send, Copy, Check, ChevronDown, Sparkles, Brain, Cpu, ShieldCheck, Rocket, FileText, MessageCircle, Briefcase } from 'lucide-react';
 import gsap from 'gsap';
-import { useAstraVoice } from '@/hooks/useAstraVoice';
 import { useIsMobile } from '@/hooks/useMobile';
 import { useMode } from '@/contexts/ModeContext';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -118,7 +117,6 @@ export function AstraAssistant() {
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { speak, stop } = useAstraVoice();
   const isMobile = useIsMobile();
 
   const handleAction = (type: string) => {

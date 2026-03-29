@@ -323,77 +323,6 @@ function ContactSection() {
   );
 }
 
-function NeuralHUD() {
-  const { isPerformanceMode, setIsPerformanceMode, isRecruiterMode } = useMode();
-  const [fps, setFps] = useState(60);
-  const [latency, setLatency] = useState(24);
-  const [memory, setMemory] = useState(128);
-
-  useEffect(() => {
-    let frames = 0;
-    let lastTime = performance.now();
-    
-    const updateFPS = () => {
-      frames++;
-      const now = performance.now();
-      if (now >= lastTime + 1000) {
-        setFps(Math.round((frames * 1000) / (now - lastTime)));
-        frames = 0;
-        lastTime = now;
-      }
-      requestAnimationFrame(updateFPS);
-    };
-    const reqId = requestAnimationFrame(updateFPS);
-
-    const interval = setInterval(() => {
-      setLatency(12 + Math.floor(Math.random() * 5));
-      setMemory(Math.floor(Math.random() * 512 + 256));
-    }, 2000);
-
-    return () => {
-      cancelAnimationFrame(reqId);
-      clearInterval(interval);
-    };
-  }, []);
-
-  if (isRecruiterMode) return null;
-
-  return (
-    <div className="fixed top-24 right-6 z-50 hidden xl:flex flex-col gap-4">
-      <div className="glass-panel p-4 border border-white/10 bg-black/40 backdrop-blur-md rounded-2xl flex flex-col gap-3 min-w-[220px] pointer-events-auto shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-1">
-          <span className="text-[10px] font-mono text-[var(--neon-cyan)] tracking-wider uppercase">Neural_Uplink</span>
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] font-mono text-white/40">{fps} FPS</span>
-            <div className={`w-2 h-2 rounded-full ${fps > 55 ? 'bg-[var(--neon-cyan)]' : 'bg-yellow-500'} animate-pulse`} style={{ boxShadow: fps > 55 ? '0 0 10px var(--neon-cyan)' : 'none' }} />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between items-center text-[9px] font-mono">
-            <span className="text-white/60">LATENCY_MS</span>
-            <span className="text-[var(--neon-cyan)]">{latency}.002ms</span>
-          </div>
-          <div className="flex justify-between items-center text-[9px] font-mono">
-            <span className="text-white/60">AETHER_POOL</span>
-            <span className="text-[var(--neon-purple)]">{memory} MB</span>
-          </div>
-        </div>
-
-        {/* HUD Controls */}
-        <div className="pt-2">
-          <button 
-            onClick={() => setIsPerformanceMode(!isPerformanceMode)}
-            className={`w-full text-[8px] font-mono border py-2 rounded-lg transition-all flex items-center justify-center gap-2 ${isPerformanceMode ? 'border-[var(--neon-cyan)] text-[var(--neon-cyan)] bg-[var(--neon-cyan)]/10' : 'border-white/10 text-white/40'}`}
-          >
-            <Zap className="w-3 h-3" />
-            {isPerformanceMode ? 'PEAK_PERFORMANCE' : 'ECO_MODE_ACTIVE'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Home() {
   const isMobile = useIsMobile();
@@ -442,7 +371,6 @@ export default function Home() {
 
       <div className="relative z-10">
         <Navigation />
-        {!isMobile && <NeuralHUD />}
         
         <HeroSection />
         

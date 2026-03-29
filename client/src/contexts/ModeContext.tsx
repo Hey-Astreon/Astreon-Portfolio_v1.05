@@ -37,8 +37,6 @@ export const ModeProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('astra-recruiter-mode', String(isRecruiterMode));
     if (isRecruiterMode) {
         document.documentElement.classList.add('recruiter-mode');
-        // Recruiter mode implies performance optimization
-        setIsPerformanceMode(true);
     } else {
         document.documentElement.classList.remove('recruiter-mode');
     }

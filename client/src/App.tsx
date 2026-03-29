@@ -12,7 +12,7 @@ import { CursorTrail } from "./components/CursorTrail";
 
 // Lazy-Uplink: Deferred 3D Modules
 const AstraAssistant = lazy(() => import("./components/AstraAssistant").then(m => ({ default: m.AstraAssistant })));
-const AetherTuner = lazy(() => import("./components/AetherTuner").then(m => ({ default: m.AetherTuner })));
+const SystemControl = lazy(() => import("./components/SystemControl").then(m => ({ default: m.SystemControl })));
 
 
 function Router() {
@@ -40,7 +40,7 @@ function App() {
               <ScrollProgress />
               <Suspense fallback={null}>
                 <AstraAssistant />
-                <AetherTuner />
+                <SystemControl />
               </Suspense>
               <div className="animate-astra-fade">
                 <CursorTrail />

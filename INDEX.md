@@ -1,4 +1,4 @@
-# 📚 Ayushi Raj 3D Portfolio - Complete Index
+# 📚 Roushan Kumar 3D Portfolio - Complete Index
 
 ## 📖 Documentation Files
 
@@ -358,7 +358,7 @@ pnpm update         # Update all
 
 ## 📄 License
 
-© 2026 Ayushi Raj. All rights reserved.
+© 2026 Roushan Kumar. All rights reserved.
 
 ---
 
@@ -375,4 +375,4 @@ pnpm update         # Update all
 
 **Last Updated:** March 22, 2026  
 **Checkpoint Version:** cc13f2c4  
-**Built with ❤️ by Ayushi Raj**
+**Built with ❤️ by Roushan Kumar**

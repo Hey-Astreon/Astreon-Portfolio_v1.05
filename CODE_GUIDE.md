@@ -1,4 +1,4 @@
-# Code Guide - Ayushi Raj 3D Portfolio
+# Code Guide - Roushan Kumar 3D Portfolio
 
 ## Quick Reference
 

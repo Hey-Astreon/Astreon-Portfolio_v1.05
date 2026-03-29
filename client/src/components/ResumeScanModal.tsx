@@ -116,7 +116,7 @@ export function ResumeScanModal({ isOpen, onClose, onDownload }: { isOpen: boole
 
             {/* Footer */}
             <div className="p-4 bg-black/40 border-t border-[#e91e8c]/10 text-center">
-              <span className="text-[9px] font-mono text-[#fdf0ff]/30 tracking-tighter uppercase">Ayushi Raj // AR_ARCHITECT_REPLICATION_V3.0</span>
+              <span className="text-[9px] font-mono text-[#fdf0ff]/30 tracking-tighter uppercase">Roushan Kumar // RK_ARCHITECT_REPLICATION_V5.0</span>
             </div>
           </motion.div>
         </div>
